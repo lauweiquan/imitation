@@ -242,7 +242,7 @@ transitions = rollout.flatten_trajectories(trajectory)
 # for elements in transitions:
 #     print(elements['obs'].shape)
 #     print("one element done")
-data = np.load('transitions.npy', allow_pickle=True)
+# data = np.load('transitions.npy', allow_pickle=True)
 # print(data)
 bc_trainer = bc.BC(
     observation_space= observation_space,
