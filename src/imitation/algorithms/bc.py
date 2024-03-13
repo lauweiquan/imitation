@@ -285,7 +285,7 @@ class BC(algo_base.DemonstrationAlgorithm):
         optimizer_kwargs: Optional[Mapping[str, Any]] = None,
         ent_weight: float = 1e-3,
         l2_weight: float = 0.0,
-        device: Union[str, th.device] = "auto",
+        device: Union[str, th.device] = "cpu",
         custom_logger: Optional[imit_logger.HierarchicalLogger] = None,
     ):
         """Builds BC.
@@ -385,7 +385,7 @@ class BC(algo_base.DemonstrationAlgorithm):
         n_batches: Optional[int] = None,
         on_epoch_end: Optional[Callable[[], None]] = None,
         on_batch_end: Optional[Callable[[], None]] = None,
-        log_interval: int = 500,
+        log_interval: int = 40,
         log_rollouts_venv: Optional[vec_env.VecEnv] = None,
         log_rollouts_n_episodes: int = 5,
         progress_bar: bool = True,

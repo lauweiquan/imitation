@@ -78,6 +78,7 @@ class DictObs:
             The length (first dimension) of the constituent arrays
         """
         lens = set(len(v) for v in self._d.values())
+        # print(lens)
         if len(lens) == 1:
             return lens.pop()
         elif len(lens) == 0:
@@ -392,6 +393,7 @@ class Trajectory:
 
     def __post_init__(self):
         """Performs input validation: check shapes are as specified in docstring."""
+        # print(len(self.obs), len(self.acts))
         if len(self.obs) != len(self.acts) + 1:
             raise ValueError(
                 "expected one more observations than actions: "
