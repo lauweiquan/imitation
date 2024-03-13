@@ -127,6 +127,7 @@ def load_trajectory_from_file(file_path):
         observations['color_image'] = np.array(color_image)
         observations['cart_traj'] = np.array((pd.eval(data[2])), dtype="float32")
         trajectory_data['obs'] = DictObs(observations)
+        print(trajectory_data['obs'].shape)
         # trajectory_data['terminal'] = data[4].strip()
         # print(observations['color_image'].shape)
 

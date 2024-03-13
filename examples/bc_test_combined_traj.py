@@ -13,7 +13,7 @@ from gymnasium import spaces
 from PIL import Image
 import pandas as pd
 
-def load_image(image_path):
+def load_depth_image(image_path):
     """
     Load an image from file and convert it to a numpy array.
  
@@ -25,9 +25,26 @@ def load_image(image_path):
     """
     image = Image.open(image_path)
     image_array = np.array(image)
-    # print("printing image array")
-    # print(image_array)
+    # print("printing depth image array")
+    # print(image_array.shape)
     return image_array
+
+def load_color_image(image_path):
+    """
+    Load an image from file and convert it to a numpy array.
+ 
+    Args:
+        image_path (str): Path to the image file.
+ 
+    Returns:
+        np.ndarray: Numpy array containing the image data.
+    """
+    image = Image.open(image_path)
+    image_array = np.array(image)
+    image_transpose = np.transpose(image_array, (2, 0, 1))
+    # print("printing color image array")
+    # print(image_transpose.shape)
+    return image_transpose
 
  
 def load_trajectory_from_file(file_path):
@@ -93,9 +110,9 @@ def load_trajectory_from_file(file_path):
         data = line.split('|')
         # print(data)
         depth_path = data[0].strip()
-        depth_image = load_image(depth_path)
+        depth_image = load_depth_image(depth_path)
         color_path = data[1].strip()
-        color_image = load_image(color_path)
+        color_image = load_color_image(color_path)
         # print(depth_image)
         observations['depth_image'].append(depth_image)
         observations['color_image'].append(color_image)
@@ -183,12 +200,12 @@ observation_space = spaces.Dict(
 
                     "depth_image": spaces.Box(low=0,
                                         high=255,
-                                        shape=(H, W, 1),
+                                        shape=(H, W),
                                         dtype=np.uint8),
 
                     "color_image": spaces.Box(low=0,
                                         high=255,
-                                        shape=(H, W, 3),
+                                        shape=(3, H, W),
                                         dtype=np.uint8)
                 }
             )
@@ -243,7 +260,9 @@ transitions = rollout.flatten_trajectories(trajectory)
 #     print(elements['obs'].shape)
 #     print("one element done")
 # data = np.load('transitions.npy', allow_pickle=True)
-# print(data)
+# for dee in data:
+#     print(dee['obs'].shape)
+#     print("one element done")
 bc_trainer = bc.BC(
     observation_space= observation_space,
     action_space= action_space,
