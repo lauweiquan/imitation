@@ -3,6 +3,8 @@
 *.html
 output/
 /data/
+/data_test/
+/trained_policy/
 auto.pkl
 nohup.out
 

@@ -248,24 +248,24 @@ rollouts = rollout.rollout(
 )
 # Example usage:
 trajectory_file_path = '../data/space_data.txt'
-trajectory = load_trajectory_from_file(trajectory_file_path)
-print(trajectory)
+# trajectory = load_trajectory_from_file(trajectory_file_path)
+# print(trajectory)
 # for traj in trajectory:
 #     print(traj)
-transitions = rollout.flatten_trajectories(trajectory)
-# transitions = rollout.flatten_trajectories(rollouts)
+# transitions = rollout.flatten_trajectories(trajectory)
+transitions = rollout.flatten_trajectories(rollouts)
 # print(rollouts)
 # for elements in transitions:
 #     print(len(elements['obs']))
 #     print("one element done")
-data = np.load('transitions.npy', allow_pickle=True)
+# data = np.load('transitions.npy', allow_pickle=True)
 # print(data)
 bc_trainer = bc.BC(
-    observation_space= observation_space,
-    action_space= action_space,
+    observation_space= env.observation_space,
+    action_space= env.action_space,
     demonstrations=transitions,
     rng=rng,
 )
 bc_trainer.train(n_epochs=1)
-# reward, _ = evaluate_policy(bc_trainer.policy, env, 10)
-# print("Reward:", reward)
+reward, _ = evaluate_policy(bc_trainer.policy, env, 10)
+print("Reward:", reward)
