@@ -6,7 +6,6 @@ from imitation.data.types import Trajectory, DictObs
 from imitation.algorithms import bc
 from imitation.data import rollout
 from imitation.data.wrappers import RolloutInfoWrapper
-from imitation.policies.serialize import load_policy
 from imitation.util.util import make_vec_env, save_policy
 
 from gymnasium import spaces
@@ -38,10 +37,15 @@ class ObservationMatchingEnv(gym.Env):
         self.observation_space = spaces.Dict(
                         {
                             # Modify accordingly if you need to use joint states
-                            "cart_traj": spaces.Box(low=-2.0, 
+                            "cart_traj": spaces.Box(low=-1.0, 
                                                     high=1.0, 
                                                     shape=(7,), 
                                                     dtype=np.float64),
+
+                            "joint_pose": spaces.Box(low=-1.0, 
+                                            high=1.0, 
+                                            shape=(6,), 
+                                            dtype=np.float64),
 
                             "ft_sensor": spaces.Box(low=-1.0, 
                                                     high=1.0, 
@@ -128,7 +132,8 @@ def load_trajectory_from_file(file_path):
                     'depth_image': [],
                     'color_image': [],
                     'ft_sensor': [],
-                    'cart_traj': []
+                    'cart_traj': [],
+                    'joint_pose': []
                     }
     # trajectory_data = {
     #     'obs': [],
@@ -151,6 +156,7 @@ def load_trajectory_from_file(file_path):
             observations['color_image'] = np.array(observations['color_image'])
             observations['ft_sensor'] = np.array(observations['ft_sensor'])
             observations['cart_traj'] = np.array(observations['cart_traj'], dtype="float32")
+            observations['joint_pose'] = np.array(actions)
             # print(observations['color_image'].shape)
             trajectory_data = {
                 'obs': DictObs(observations),
@@ -163,7 +169,8 @@ def load_trajectory_from_file(file_path):
                     'depth_image': [],
                     'color_image': [],
                     'ft_sensor': [],
-                    'cart_traj': []
+                    'cart_traj': [],
+                    'joint_pose': []
                     }
             actions = []
             delta_list = []
@@ -248,7 +255,7 @@ def load_trajectory_from_file(file_path):
  
     return traj_list
  
-def load_observation(file_path):
+def load_predict_observation(file_path, policy):
     # Load trajectory data from the text file
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -260,59 +267,87 @@ def load_observation(file_path):
                     'ft_sensor': [],
                     'cart_traj': []
                     }
-    obs_list = []
+    acts_list = []
+    actions = []
     for line in lines:
-            
+        if line[0] == "\\":
+            # observations['depth_image'] = np.array(observations['depth_image'])
+            # observations['color_image'] = np.array(observations['color_image'])
+            # observations['ft_sensor'] = np.array(observations['ft_sensor'])
+            # observations['cart_traj'] = np.array(observations['cart_traj'], dtype="float32")
+            # print(observations['color_image'].shape)
+            break
 
         data = line.split('|')
+        # print(data)
         depth_path = data[0].strip()
         depth_image = load_depth_image(depth_path)
         color_path = data[1].strip()
         color_image = load_color_image(color_path)
-        observations['depth_image'] = np.array(depth_image)
-        observations['color_image'] = np.array(color_image)
-        observations['ft_sensor'] = np.array((pd.eval(data[5])))
-        observations['cart_traj'] = np.array((pd.eval(data[2])))
-        # print(observations['depth_image'].shape)
-        return DictObs(observations)
+        # print(depth_image)
+        observations['depth_image'] = depth_image
+        observations['color_image'] = color_image
+        observations['ft_sensor'] = pd.eval(data[5])
+        observations['cart_traj'] = pd.eval(data[2])
+        observations['joint_pose'] = pd.eval(data[3])
+        print(observations)
+        actions.append(np.array(pd.eval(data[3]), dtype="float32"))
+        # print(len(actions))
+        if len(actions) > 1:
+            delta = actions[-1] - actions[-2]
+            # print("delta pose")
+            # print(delta)
+        
+        acts, _ = policy.predict(observations, deterministic = True)
+        print("prediction")
+        print(np.array2string(acts, separator = ","), ",")
+        acts_list.append(acts)
+    # for act in acts_list:
+    #     print(act, ",")
+    return acts_list
     
 
-# # Update these values to match your image size
-# H = 480
-# W = 640
+# Update these values to match your image size
+H = 480
+W = 640
 
 
 # # This example below assumes your image is a RGB image (no depth)
 # # If you want to include depth, you can change shape to be (H, W, 4) and modify your data accordingly
-# observation_space = spaces.Dict(
-#                 {
-#                     # Modify accordingly if you need to use joint states
-#                     "cart_traj": spaces.Box(low=-2.0, 
-#                                             high=1.0, 
-#                                             shape=(7,), 
-#                                             dtype=np.float64),
+observation_space = spaces.Dict(
+                {
+                    # Modify accordingly if you need to use joint states
+                    "cart_traj": spaces.Box(low=-1.0, 
+                                            high=1.0, 
+                                            shape=(7,), 
+                                            dtype=np.float64),
+                                            
+                    "joint_pose": spaces.Box(low=-1.0, 
+                                            high=1.0, 
+                                            shape=(6,), 
+                                            dtype=np.float64),
 
-#                     "ft_sensor": spaces.Box(low=-1.0, 
-#                                             high=1.0, 
-#                                             shape=(6,), 
-#                                             dtype=np.float64),
+                    "ft_sensor": spaces.Box(low=-1.0, 
+                                            high=1.0, 
+                                            shape=(6,), 
+                                            dtype=np.float64),
 
-#                     "depth_image": spaces.Box(low=0,
-#                                         high=255,
-#                                         shape=(H, W),
-#                                         dtype=np.uint8),
+                    "depth_image": spaces.Box(low=0,
+                                        high=255,
+                                        shape=(H, W),
+                                        dtype=np.uint8),
 
-#                     "color_image": spaces.Box(low=0,
-#                                         high=255,
-#                                         shape=(3, H, W),
-#                                         dtype=np.uint8)
-#                 }
-#             )
+                    "color_image": spaces.Box(low=0,
+                                        high=255,
+                                        shape=(3, H, W),
+                                        dtype=np.uint8)
+                }
+            )
 
-# action_space = spaces.Box(low=-1.0, 
-#                             high=1.0, 
-#                             shape=(6,), 
-#                             dtype=np.float64)
+action_space = spaces.Box(low=-1.0, 
+                            high=1.0, 
+                            shape=(6,), 
+                            dtype=np.float64)
 
 # action_space = spaces.Dict(
 #                 {
@@ -328,23 +363,23 @@ def load_observation(file_path):
 
 rng = np.random.default_rng(0)
 
-# Create a single environment for training with SB3
-env = ObservationMatchingEnv()
-env = TimeLimit(env, max_episode_steps=500)
+# # Create a single environment for training with SB3
+# env = ObservationMatchingEnv()
+# env = TimeLimit(env, max_episode_steps=500)
 
-# Create a vectorized environment for training with `imitation`
-
-
-# Option A: use a helper function to create multiple environments
-def _make_env():
-    """Helper function to create a single environment. Put any logic here, but make sure to return a RolloutInfoWrapper."""
-    _env = ObservationMatchingEnv()
-    _env = TimeLimit(_env, max_episode_steps=500)
-    _env = RolloutInfoWrapper(_env)
-    return _env
+# # Create a vectorized environment for training with `imitation`
 
 
-venv = DummyVecEnv([_make_env for _ in range(4)])
+# # Option A: use a helper function to create multiple environments
+# def _make_env():
+#     """Helper function to create a single environment. Put any logic here, but make sure to return a RolloutInfoWrapper."""
+#     _env = ObservationMatchingEnv()
+#     _env = TimeLimit(_env, max_episode_steps=500)
+#     _env = RolloutInfoWrapper(_env)
+#     return _env
+
+
+# venv = DummyVecEnv([_make_env for _ in range(4)])
 
 # env = make_vec_env(
 #     "seals:seals/CartPole-v0",
@@ -375,25 +410,26 @@ transitions = rollout.flatten_trajectories(trajectory)
 #     print(len(roll))
 # print(rollouts)
 # for elements in transitions:
-#     print(elements)
+#     print(elements['acts'])
 #     print("one element done")
 # data = np.load('transitions.npy', allow_pickle=True)
 # for dee in data:
 #     print(dee['obs'].shape)
 #     print("one element done")
 bc_trainer = bc.BC(
-    observation_space= env.observation_space,
-    action_space= env.action_space,
+    observation_space= observation_space,
+    action_space= action_space,
     demonstrations=transitions,
     rng=rng,
 )
-# bc_trainer.train(n_epochs=21)
-# save_policy(bc_trainer.policy,"feeding_policy")
-loaded_policy = bc.reconstruct_policy("feeding_policy")
-obs_file_path = '../data_test/sample_data.txt'
-obs = load_observation(obs_file_path)
+# bc_trainer.train(n_epochs=22)
+
+# save_policy(bc_trainer.policy,"../trained_policy/feeding_policy")
+loaded_policy = bc.reconstruct_policy("../trained_policy/feeding_policy_full")
+obs_file_path = '../data/sample_data.txt'
+# obs = venv.reset()
+acts = load_predict_observation(obs_file_path, loaded_policy)
+print(acts)
 # reward, _ = evaluate_policy(loaded_policy, env, 10)
 # print("Reward:", reward)
 
-acts, _ = loaded_policy.predict(obs)
-print(acts)
