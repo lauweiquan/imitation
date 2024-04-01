@@ -18,7 +18,6 @@ from typing import Any
 import numpy as np
 
 from gymnasium.wrappers import TimeLimit
-from imitation.data import rollout
 from imitation.data.wrappers import RolloutInfoWrapper
 from imitation.util.util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
@@ -265,7 +264,8 @@ def load_predict_observation(file_path, policy):
                     'depth_image': [],
                     'color_image': [],
                     'ft_sensor': [],
-                    'cart_traj': []
+                    'cart_traj': [],
+                    'joint_pose': []
                     }
     acts_list = []
     actions = []
@@ -290,7 +290,7 @@ def load_predict_observation(file_path, policy):
         observations['ft_sensor'] = pd.eval(data[5])
         observations['cart_traj'] = pd.eval(data[2])
         observations['joint_pose'] = pd.eval(data[3])
-        print(observations)
+        # print(observations)
         actions.append(np.array(pd.eval(data[3]), dtype="float32"))
         # print(len(actions))
         if len(actions) > 1:

@@ -1,6 +1,20 @@
-# Download my dataset from the real xarm6 in the link below
+# Download my dataset from the real xarm6 from the link below
 https://drive.google.com/drive/folders/11BKisNJngZcd2CbqGbqkTb_do7KQ0EJ4?usp=sharing
 
+# Download my dataset from mujoco from the link below
+https://drive.google.com/drive/folders/1fCy7GeLgxOa617Oiz1fwiP4aQFrFy_Ww?usp=sharing
+
+# Usage
+1. For data from real arm
+```bash
+python bc_test_combined_traj.py
+
+```
+2. For data from mujoco
+```bash
+python bc_test_mujoco.py
+
+```
 
 
 [![CircleCI](https://circleci.com/gh/HumanCompatibleAI/imitation.svg?style=svg)](https://circleci.com/gh/HumanCompatibleAI/imitation)

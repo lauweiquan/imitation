@@ -197,7 +197,7 @@ W = 640
 observation_space = spaces.Dict(
                 {
                     # Modify accordingly if you need to use joint states
-                    "cart_traj": spaces.Box(low=-2.0, 
+                    "cart_traj": spaces.Box(low=-1.0, 
                                             high=1.0, 
                                             shape=(7,), 
                                             dtype=np.float64),
