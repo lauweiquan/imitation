@@ -385,7 +385,7 @@ class BC(algo_base.DemonstrationAlgorithm):
         n_batches: Optional[int] = None,
         on_epoch_end: Optional[Callable[[], None]] = None,
         on_batch_end: Optional[Callable[[], None]] = None,
-        log_interval: int = 60,
+        log_interval: int = 10,
         log_rollouts_venv: Optional[vec_env.VecEnv] = None,
         log_rollouts_n_episodes: int = 5,
         progress_bar: bool = True,

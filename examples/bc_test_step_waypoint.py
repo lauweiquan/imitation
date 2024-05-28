@@ -1,5 +1,4 @@
 import numpy as np
-# import gymnasium as gym
 from stable_baselines3.common.evaluation import evaluate_policy
 from imitation.data.types import Trajectory, DictObs
 
