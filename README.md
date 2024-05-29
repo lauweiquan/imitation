@@ -1,18 +1,23 @@
-# Download my dataset from the real xarm6 from the link below
-https://drive.google.com/drive/folders/11BKisNJngZcd2CbqGbqkTb_do7KQ0EJ4?usp=sharing
+# Dataset download
+1. Real xarm6 [here](https://drive.google.com/drive/folders/11BKisNJngZcd2CbqGbqkTb_do7KQ0EJ4?usp=sharing)
 
-# Download my dataset from mujoco from the link below
-https://drive.google.com/drive/folders/1fCy7GeLgxOa617Oiz1fwiP4aQFrFy_Ww?usp=sharing
+2. Mujoco [here](https://drive.google.com/drive/folders/1fCy7GeLgxOa617Oiz1fwiP4aQFrFy_Ww?usp=sharing)
 
 # Usage
-1. For data from real arm
+1. Train BC policy from real arm data
 ```bash
-python bc_test_combined_traj.py
+python bc_train_real.py
 
 ```
-2. For data from mujoco
+2. Train BC policy from mujoco data with joint position as action
 ```bash
-python bc_test_mujoco.py
+python bc_mujoco_joint.py
+
+```
+
+3. Train BC policy from mujoco data with cartesian pose as action
+```bash
+python bc_mujoco_cartesian.py
 
 ```
 
