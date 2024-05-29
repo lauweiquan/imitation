@@ -3,6 +3,8 @@
 
 2. Mujoco [here](https://drive.google.com/drive/folders/1fCy7GeLgxOa617Oiz1fwiP4aQFrFy_Ww?usp=sharing)
 
+3. Trained polcy [here](https://drive.google.com/drive/folders/1o7RbTzRUkQae9IyXwnKFpQS0XFvpZzhi)
+
 # Usage
 1. Train BC policy from real arm data
 ```bash
